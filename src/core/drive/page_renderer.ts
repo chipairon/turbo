@@ -3,7 +3,10 @@ import { PageSnapshot } from "./page_snapshot"
 
 export class PageRenderer extends Renderer<HTMLBodyElement, PageSnapshot> {
   get shouldRender() {
-    return this.newSnapshot.isVisitable && this.trackedElementsAreIdentical
+    return this.newSnapshot.isVisitable && (
+      this.allCurrentTrackedElementsAreIdenticalInNewHead ||
+      this.newTrackedElementsExistInCurrentHead
+    )
   }
 
   prepareToRender() {
@@ -49,6 +52,20 @@ export class PageRenderer extends Renderer<HTMLBodyElement, PageSnapshot> {
 
   get trackedElementsAreIdentical() {
     return this.currentHeadSnapshot.trackedElementSignature == this.newHeadSnapshot.trackedElementSignature
+  }
+
+  get allCurrentTrackedElementsAreIdenticalInNewHead(): boolean {
+    const currentTrackedElementsHTMLStrings = this.currentHeadSnapshot.trackedElements.map(el => el[0])
+    const newTrackedElementsHTMLStrings = this.newHeadSnapshot.trackedElements.map(el => el[0])
+
+    return currentTrackedElementsHTMLStrings.every(el => newTrackedElementsHTMLStrings.includes(el))
+  }
+
+  get newTrackedElementsExistInCurrentHead(): boolean {
+    const currentTrackedElementsHTMLStrings = this.currentHeadSnapshot.trackedElements.map(el => el[0])
+    const newTrackedElementsHTMLStrings = this.newHeadSnapshot.trackedElements.map(el => el[0])
+
+    return newTrackedElementsHTMLStrings.every(el => currentTrackedElementsHTMLStrings.includes(el))
   }
 
   copyNewHeadStylesheetElements() {

@@ -35,6 +35,12 @@ export class HeadSnapshot extends Snapshot<HTMLHeadElement> {
       .join("")
   }
 
+  get trackedElements() {
+    return Object.keys(this.detailsByOuterHTML)
+      .filter(outerHTML => this.detailsByOuterHTML[outerHTML].tracked)
+      .map(outerHTML => [outerHTML, this.detailsByOuterHTML[outerHTML]])
+  }
+
   getScriptElementsNotInSnapshot(snapshot: HeadSnapshot) {
     return this.getElementsMatchingTypeNotInSnapshot("script", snapshot)
   }
@@ -115,6 +121,6 @@ function elementWithoutNonce(element: Element) {
   if (element.hasAttribute("nonce")) {
     element.setAttribute("nonce", "")
   }
-  
-  return element  
+
+  return element
 }

@@ -41,6 +41,21 @@ export class RenderingTests extends TurboDriveTestCase {
     this.assert.equal(await this.visitAction, "advance")
   }
 
+  async "test does not reload when new tracked element is introduced"() {
+    this.clickSelector("#new-tracked-asset-link")
+    await this.nextBody
+    this.assert.equal(await this.pathname, "/src/tests/fixtures/new_tracked_asset.html")
+    this.assert.equal(await this.visitAction, "advance")
+  }
+
+  async "test does not reload when a tracked element from previous page is not present on new page"() {
+    await this.goToLocation("/src/tests/fixtures/new_tracked_asset.html")
+    this.clickSelector("#tracked-asset-not-present")
+    await this.nextBody
+    this.assert.equal(await this.pathname, "/src/tests/fixtures/rendering.html")
+    this.assert.equal(await this.visitAction, "advance")
+  }
+
   async "test reloads when turbo-visit-control setting is reload"() {
     this.clickSelector("#visit-control-reload-link")
     await this.nextBody
